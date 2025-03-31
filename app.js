@@ -49,6 +49,24 @@ export const searchAPI = async (keyword) => {
     }
 };
 
+export const searchAPIbyID = async (id) => {
+    try {
+        const result = await api.getDetailedData(id);
+
+        // Prevent further execution if no results exist
+        if (!result) {
+            console.log('No results found.');
+            return; 
+        }
+
+        displayItemDetails(result);
+
+
+    } catch (error) {
+        console.error(`Error fetching data: `, error.message);
+    }
+};
+
 // Function to get history from files
 export const getHistory = async (type) => {
 
@@ -140,7 +158,7 @@ export const viewBookmarks = async () => {
             {
                 type: 'list',
                 name: 'selectedBookmark',
-                message: 'Select a bookmark to manage:',
+                message: 'Select a bookmark to delete:',
                 choices: [...bookmarks.map(b => b.title), new inquirer.Separator(), '❌ Cancel']
             }
         ]);

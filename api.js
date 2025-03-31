@@ -12,17 +12,17 @@ export const searchByKeyword = async (keyword) => {
     }
 };
 
-export const getDetailedData = async (id) => {
+export const getDetailedData = async (isbn) => {
     try {
-        console.log(`Fetching detailed data for ID: ${id}...`);
-        const response = await axios.get(`https://openlibrary.org/search.json?q=${id}`);
+        console.log(`Fetching detailed data for ISBN: ${isbn}...`);
+        const response = await axios.get(`https://openlibrary.org/search.json?isbn=${isbn}.json`);
 
-        if (!response.data) {
+        if (!response.data["docs"][0]) {
             console.log("No details found for the selected item.");
             return null;
         }
 
-        return response.data;
+        return response.data["docs"][0];
 
     } catch (error) {
         console.error("Error fetching detailed data.", error.message);

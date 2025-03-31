@@ -117,22 +117,35 @@ export const saveUnique = async (collection, data) => {
  * @returns {Promise<void>}
  */
 export const deleteOne = async (collection, query) => {
-    try {
-        let records = await _read(collection);
-        const [key, value] = Object.entries(query)[0];
+  try {
+    // Read the existing records from the specified collection (JSON file)
+    let records = await _read(collection);
 
-        const filteredRecords = records.filter(record => record[key] !== value);
+    // Extract the key-value pair from the query object
+    const [key, value] = Object.entries(query)[0];
 
-        if (filteredRecords.length === records.length) {
-            console.log(`⚠️ No record found for deletion in ${collection}.`);
-            return;
-        }
+    // Filter out the record that matches the given key-value pair
+    const filteredRecords = records.filter((record) => record[key] !== value);
 
-        const fullPath = path.resolve(dbDirectory, `${collection}.json`);
-        await fs.promises.writeFile(fullPath, JSON.stringify(filteredRecords, null, 2));
-
-        console.log(`✅ Successfully deleted ${key}: ${value}`);
-    } catch (error) {
-        throw new Error(`Error deleting record in ${collection}: ${error.message}`);
+    // If no records were removed, log a warning and exit
+    if (filteredRecords.length === records.length) {
+      console.log(`⚠️ No record found for deletion in ${collection}.`);
+      return;
     }
+
+    // Get the full path of the JSON file where the collection is stored
+    const fullPath = path.resolve(dbDirectory, `${collection}.json`);
+
+    // Write the updated records without the deleted one back to the file
+    await fs.promises.writeFile(
+      fullPath,
+      JSON.stringify(filteredRecords, null, 2)
+    );
+    
+    // Log success message indicating which record was deleted
+    console.log(`✅ Successfully deleted ${key}: ${value}`);
+  } catch (error) {
+    // Handle any errors that occur during the deletion process
+    throw new Error(`Error deleting record in ${collection}: ${error.message}`);
+  }
 };
